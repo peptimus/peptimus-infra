@@ -1,0 +1,68 @@
+name: Bug Report
+description: Report a bug in the Peptimus platform
+title: "[bug] "
+labels: ["bug", "triage"]
+assignees:
+  - peptimusdev
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill out the sections below.
+  - type: dropdown
+    id: repo
+    attributes:
+      label: Affected Repository
+      options:
+        - peptimus (web app)
+        - peptimus-api (API server)
+        - peptimus-shared (shared packages)
+        - peptimus-infra (monorepo / CI)
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear description of the bug.
+      placeholder: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Go to ...
+        2. Click on ...
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      placeholder: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      placeholder: What actually happened?
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: |
+        OS: macOS 14 / Windows 11 / Ubuntu 22
+        Browser: Chrome 124 / Firefox 126
+        Wallet: Phantom / Backpack / Solflare
+        Network: Mainnet
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or Screenshots
+      description: Paste any relevant console errors or attach screenshots.
