@@ -1,0 +1,26 @@
+name: Peptimus CI
+description: GitHub App for Peptimus CI/CD automation. Manages builds, checks, and pull request status across all Peptimus repositories.
+url: https://github.com/peptimus
+hook_attributes:
+  url: https://github.com/peptimus
+redirect_url: https://github.com/peptimus
+public: false
+default_permissions:
+  contents: write
+  issues: write
+  pull_requests: write
+  actions: write
+  checks: write
+  statuses: write
+  metadata: read
+default_events:
+  - push
+  - pull_request
+  - pull_request_review
+  - issues
+  - issue_comment
+  - check_run
+  - check_suite
+  - create
+  - delete
+  - release
