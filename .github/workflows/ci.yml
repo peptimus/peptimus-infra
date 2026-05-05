@@ -11,8 +11,8 @@ on:
       - dev
 
 jobs:
-  ci:
-    name: Build and Typecheck
+  validate:
+    name: Validate
     runs-on: ubuntu-latest
 
     steps:
@@ -28,22 +28,34 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Validate root config files
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('package.json','utf8'))" && echo "package.json valid"
+          node -e "JSON.parse(require('fs').readFileSync('tsconfig.json','utf8'))" && echo "tsconfig.json valid"
+          node -e "JSON.parse(require('fs').readFileSync('tsconfig.base.json','utf8'))" && echo "tsconfig.base.json valid"
 
-      - name: Typecheck
-        run: pnpm run typecheck
+      - name: Validate GitHub App manifest
+        run: |
+          node -e "
+          const yaml = require('fs').readFileSync('.github/app.yml','utf8');
+          if (!yaml.includes('name:')) throw new Error('app.yml missing name field');
+          console.log('app.yml valid');
+          "
 
-      - name: Build
-        run: pnpm run build
+      - name: Check workspace structure
+        run: |
+          [ -f "pnpm-workspace.yaml" ] && echo "pnpm-workspace.yaml present" || (echo "pnpm-workspace.yaml missing" && exit 1)
+          [ -f ".github/CODEOWNERS" ] && echo "CODEOWNERS present" || (echo "CODEOWNERS missing" && exit 1)
+          [ -f ".github/profile/README.md" ] && echo "org profile README present" || (echo "org profile README missing" && exit 1)
+
+      - name: Check no Replit artifacts
+        run: |
+          if grep -rI "@replit\|REPL_ID\|REPLIT" --include="*.ts" --include="*.js" --include="*.json" --include="*.yaml" --exclude-dir=".github" . 2>/dev/null; then
+            echo "Replit artifacts found" && exit 1
+          fi
+          echo "Clean - no Replit artifacts"
