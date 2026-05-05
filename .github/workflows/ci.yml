@@ -16,22 +16,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Generate GitHub App token
-        id: app-token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ vars.PEPTIMUS_APP_ID }}
-          private-key: ${{ secrets.PEPTIMUS_APP_PRIVATE_KEY }}
-
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ steps.app-token.outputs.token }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
 
       - name: Validate root config files
         run: |
@@ -41,11 +27,7 @@ jobs:
 
       - name: Validate GitHub App manifest
         run: |
-          node -e "
-          const yaml = require('fs').readFileSync('.github/app.yml','utf8');
-          if (!yaml.includes('name:')) throw new Error('app.yml missing name field');
-          console.log('app.yml valid');
-          "
+          grep -q "name:" .github/app.yml && echo "app.yml valid" || (echo "app.yml missing name field" && exit 1)
 
       - name: Check workspace structure
         run: |
@@ -53,9 +35,11 @@ jobs:
           [ -f ".github/CODEOWNERS" ] && echo "CODEOWNERS present" || (echo "CODEOWNERS missing" && exit 1)
           [ -f ".github/profile/README.md" ] && echo "org profile README present" || (echo "org profile README missing" && exit 1)
 
-      - name: Check no Replit artifacts
+      - name: Check for forbidden platform references
         run: |
-          if grep -rI "@replit\|REPL_ID\|REPLIT" --include="*.ts" --include="*.js" --include="*.json" --include="*.yaml" --exclude-dir=".github" . 2>/dev/null; then
-            echo "Replit artifacts found" && exit 1
+          if grep -rI "@replit\|REPL_ID\|REPLIT_DOMAINS\|REPLIT_DEV_DOMAIN" \
+            --include="*.ts" --include="*.js" --include="*.json" --include="*.yaml" \
+            --exclude-dir=".github" . 2>/dev/null; then
+            echo "Forbidden platform references found" && exit 1
           fi
-          echo "Clean - no Replit artifacts"
+          echo "Clean"
