@@ -69,18 +69,6 @@ pnpm --filter @workspace/db run push
 
 ---
 
-## GitHub App Setup
-
-This monorepo uses a GitHub App for CI authentication instead of a personal access token.
-
-1. Go to [github.com/organizations/peptimus/settings/apps/new](https://github.com/organizations/peptimus/settings/apps/new)
-2. Use the manifest at `.github/app.yml` to configure permissions
-3. After creating the app, add two secrets to each repository:
-   - `PEPTIMUS_APP_ID` (repository variable)
-   - `PEPTIMUS_APP_PRIVATE_KEY` (repository secret)
-
----
-
 ## Stack
 
 | Layer | Technology |
